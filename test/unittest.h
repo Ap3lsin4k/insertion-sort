@@ -53,23 +53,32 @@ void assert_equal_w_msg(char message[], int result, int expected)
         printf("Failed. %d != %d\n", result, expected);
 }
 
-#define assert_matrices_are_equal(when, result_matrix, expected_matrix) \
-        {                                                                 \
-    const unsigned short my_rows = sizeof(input) / sizeof(input[0]), \
-    my_columns = sizeof(input[0]) / sizeof(input[0][0]);               \
+#define ___assert_matrices_are_equal(when, result_matrix, const_expression) \
+    const unsigned short number_of_rows = sizeof(result_matrix) / sizeof(result_matrix[0]), \
+    number_of_columns = sizeof(result_matrix[0]) / sizeof(result_matrix[0][0]);                  \
+    int const_matrix[number_of_rows][1] = const_expression;                                  \
+    assert_matrices_are_equal(when, result_matrix, const_matrix)\
+
+
+#define assert_matrices_are_equal(when, result_matrix, expected_matrix) {              \
+    const unsigned short my_rows = sizeof(expected_matrix) / sizeof(expected_matrix[0]), \
+    my_columns = sizeof(expected_matrix[0]) / sizeof(expected_matrix[0][0]);               \
     bool error=false;                                                              \
     for (unsigned short i=0; i < my_rows; ++i)   \
     {\
-for (unsigned short j=0; j < my_columns; ++j){\
-if (matrix[i][j] != input[i][j] )        \
+    for (unsigned short j=0; j < my_columns; ++j){\
+    if (result_matrix[i][j] != expected_matrix[i][j] )        \
             {                                                     \
-            printf("Failed to sort when %s. Matrices with size[%u][%u], are not equal at i=%u, j=%u. Expected to be equal %d but got %d\n", \
-                when, my_rows, my_columns, i, j, matrix[i][j], input[i][j]);\
+            printf("\nFailed to insertion_sort_one_column when %s. Matrices with size[%u][%u], are not equal at i=%u, j=%u. Expected to be equal %d but got %d", \
+                when, my_rows, my_columns, i, j, expected_matrix[i][j], result_matrix[i][j]);\
             error = true;                                     \
             }                                                     \
         }\
 } if (!error)                                                \
-        printf("Successfully sorted matrix with size[%u][%u] when %s.\n", my_rows, my_columns, when);\
+        printf("Successfully sorted matrix with size[%u][%u] when %s.\n", my_rows, my_columns, when);                                       \
+        else                                                                           \
+            printf("\n\n");                                       \
+        \
 }
 
 #define assert_equal_llu(result, expected) \
